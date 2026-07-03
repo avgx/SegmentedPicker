@@ -1,6 +1,7 @@
+import Foundation
 import Testing
 @testable import SegmentedPicker
 
-@Test func example() async throws {
-    // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+@Test func example() {
+    #expect(2*2==4)
 }

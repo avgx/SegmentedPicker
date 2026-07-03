@@ -1,2 +1,3 @@
 # SegmentedPicker
-Custom Picker(...).pickerStyle(.segmented) 
+
+Picker(...).pickerStyle(.segmented).fixedSize() 
