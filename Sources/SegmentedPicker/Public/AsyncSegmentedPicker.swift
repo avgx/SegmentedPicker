@@ -4,7 +4,7 @@ public struct AsyncSegmentedPicker<Data, Selection, Content>: View
 where
     Data: RandomAccessCollection,
     Data.Element == Selection,
-    Selection: Hashable,
+    Selection: Hashable & Sendable,
     Content: View
 {
     private let data: Data

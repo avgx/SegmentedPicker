@@ -1,7 +1,7 @@
 import SwiftUI
 
 @MainActor
-final class AsyncSegmentedPickerCoordinator<Selection: Hashable>: ObservableObject {
+final class AsyncSegmentedPickerCoordinator<Selection: Hashable & Sendable>: ObservableObject {
     @Published var displayedSelection: Selection
     @Published private(set) var isLoading = false
 
