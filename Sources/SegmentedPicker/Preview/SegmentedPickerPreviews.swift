@@ -33,4 +33,16 @@ import SwiftUI
     SegmentedPickerPreviewContainer(placement: .toolbarBottom, appearance: .dark)
 }
 
+#if os(iOS)
+#Preview("Small Screen Bottom Toolbar — Live Playback") {
+    SegmentedPickerCompactToolbarPreview(kind: .livePlayback)
+        .frame(width: 375, height: 812)
+}
+
+#Preview("Small Screen Bottom Toolbar — Export") {
+    SegmentedPickerCompactToolbarPreview(kind: .export)
+        .frame(width: 375, height: 812)
+}
+#endif
+
 #endif

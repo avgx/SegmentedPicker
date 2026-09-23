@@ -36,6 +36,20 @@ enum ArmDisarm: String, CaseIterable, Hashable {
     }
 }
 
+#if os(iOS)
+enum ExportMode: String, CaseIterable, Hashable {
+    case normal
+    case timelapse
+
+    var title: String {
+        switch self {
+        case .normal: "Normal"
+        case .timelapse: "Timelapse"
+        }
+    }
+}
+#endif
+
 enum PreviewError: Error {
     case failed
 }
@@ -182,6 +196,7 @@ private struct SegmentedPickerPlacementContent: View {
         SegmentedPicker(LiveOrPlayback.allCases, selection: $mode) { mode in
             Label(mode.title, systemImage: mode.systemImage)
         }
+        .fixedSize()
     }
 
     var body: some View {
@@ -250,6 +265,7 @@ private struct AsyncSegmentedPickerPlacementContent: View {
                 Text(item.title)
             }
         }
+        .fixedSize()
     }
 
     var body: some View {
@@ -294,6 +310,111 @@ private struct AsyncSegmentedPickerPlacementContent: View {
         }
     }
 }
+
+#if os(iOS)
+enum CompactToolbarPreviewKind {
+    case livePlayback
+    case export
+}
+
+@available(iOS 26.0, *)
+private struct CompactToolbarContent: ToolbarContent {
+    let kind: CompactToolbarPreviewKind
+    @Binding var mode: LiveOrPlayback
+    @Binding var exportMode: ExportMode
+    @Binding var isPlaying: Bool
+
+    var body: some ToolbarContent {
+        switch kind {
+        case .livePlayback:
+            ToolbarItem(placement: .bottomBar) {
+                Button {} label: {
+                    Image(systemName: "magnifyingglass")
+                }
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                SegmentedPicker(LiveOrPlayback.allCases, selection: $mode) { mode in
+                    Label(mode.title, systemImage: mode.systemImage)
+                }
+                .labelStyle(.titleOnly)
+                .frame(width: 160)
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                Button {
+                    isPlaying.toggle()
+                } label: {
+                    Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                        .frame(width: 44, height: 44)
+                }
+            }
+
+        case .export:
+            ToolbarItem(placement: .bottomBar) {
+                Button {} label: {
+                    Image(systemName: "xmark")
+                }
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                HStack(spacing: 4) {
+                    SegmentedPicker(ExportMode.allCases, selection: $exportMode) { mode in
+                        Text(mode.title)
+                    }
+                    .frame(width: 132)
+
+                    Menu {
+                        Button("30 sec") {}
+                        Button("1 min") {}
+                    } label: {
+                        Text("30s")
+                            .font(.caption.weight(.semibold))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 8)
+                    }
+                }
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                Button {} label: {
+                    Image(systemName: "checkmark")
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+    }
+}
+
+struct SegmentedPickerCompactToolbarPreview: View {
+    let kind: CompactToolbarPreviewKind
+
+    @State private var mode = LiveOrPlayback.live
+    @State private var exportMode = ExportMode.normal
+    @State private var isPlaying = false
+
+    var body: some View {
+        if #available(iOS 26.0, *) {
+            NavigationStack {
+                Color.black
+                    .ignoresSafeArea()
+                    .toolbar {
+                        CompactToolbarContent(
+                            kind: kind,
+                            mode: $mode,
+                            exportMode: $exportMode,
+                            isPlaying: $isPlaying
+                        )
+                    }
+                    .tint(.primary)
+            }
+            .preferredColorScheme(.dark)
+        } else {
+            Text("Bottom toolbar preview requires iOS 26 or newer.")
+        }
+    }
+}
+#endif
 
 // MARK: - Preview containers
 

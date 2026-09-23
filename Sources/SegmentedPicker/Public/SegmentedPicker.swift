@@ -29,6 +29,5 @@ where
             }
         }
         .pickerStyle(.segmented)
-        .fixedSize()
     }
 }
